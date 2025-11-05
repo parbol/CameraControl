@@ -27,17 +27,17 @@ class CameraServer:
         self.robot_PORT = robot_PORT
 
         #Picture name
-        self.pictureName = 'picture.png'
+        self.pictureName = 'pictureReceived.png'
 
         #Messages from the server
         self.serverHi = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0a, 0x00, 0xa4]
         self.serverMessage = [0x02, 0x00, 0xff, 0x44, 0x00, 0x14]
-        self.countingAnswer = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0f, 0x00, 0x02]
+        self.endTransfer = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0f, 0x00, 0x02]
 
         #Messages from the client
         self.clientHi = [0x00, 0x04, 0x04, 0x1a, 0x17, 0x02, 0xe6, 0xdf, 0x00, 0x00, 0x00, 0x00]
         self.sendSequenceOK = [0xff, 0xff, 0xff, 0xff]
-        self.takePicture = [0x00, 0x04, 0x04, 0xde, 0x16, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00]
+        self.isTakePicture = [0x00, 0x04, 0x04, 0xde, 0x16, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00]
         self.sendallorder = [0xff, 0x44, 0x44, 0x6a, 0x00, 0x02, 0x00, 0x0d, 0x00, 0x00, 0x00, 0x00]
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -60,6 +60,8 @@ class CameraServer:
                     self.exit()
             while True:
                 data = self.connection.recv(12) 
+                if not data:
+                    continue
                 if self.isTakePic(data):
                     self.handlePic()
                 else:
@@ -91,7 +93,7 @@ class CameraServer:
     ##############################################################################
     def exit(self):
 
-        self.s.shutdown(socket.SHUT_RDWR)
+        #self.s.shutdown(socket.SHUT_RDWR)
         self.s.close()
         sys.exit()
     ##############################################################################
@@ -111,11 +113,14 @@ class CameraServer:
 
     ##############################################################################
     def isEqual(self, data1, data2):
-
+        
         thedata1 = bytearray(data1)
         thedata2 = bytearray(data2)
+        if len(thedata1) != len(thedata2):
+            return False
         for i in range(0, len(thedata2)):
             if thedata1[i] != thedata2[i]:
+                print('return false')
                 return False
         return True
     ##############################################################################
@@ -128,7 +133,6 @@ class CameraServer:
 
     ##############################################################################
     def isTakePic(self, data):
-
         return self.isEqual(data, self.isTakePicture)
     ##############################################################################
 
@@ -160,10 +164,13 @@ class CameraServer:
         time.sleep(2)
         f = open(self.pictureName, 'rb')
         l = f.read(1024)
+        print(l)
         while (l):
+            print('sending info')
             self.connection.sendall(l)
             l = f.read(1024)
-            f.close()
+        f.close()
+        print('finish file transfer server')
         return True
     ##############################################################################
       

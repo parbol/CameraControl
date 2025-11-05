@@ -14,7 +14,7 @@ import os
 class RobotClient:
 
     ##############################################################################
-    def __init__(self, robot_IP, robot_PORT, filenameInput, filenameOutput):
+    def __init__(self, robot_IP, robot_PORT, filenameInput):
 
         #Technical stuff
         self.HEADER = '\033[95m'
@@ -26,14 +26,13 @@ class RobotClient:
         #Information for the client
         self.robot_IP = robot_IP
         self.robot_PORT = robot_PORT
-        self.filenameInput = filenameInput
-        self.filenameOutput = filenameOutput
+        self.fileName = filenameInput
 
         #Messages from the server
         #self.serverHi = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0a, 0x00, 0xa4, 0x02, 0x8c, 0x02, 0xa5, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00]
         self.serverHi = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0a, 0x00, 0xa4]
         self.serverMessage = [0x02, 0x00, 0xff, 0x44, 0x00, 0x14]
-        self.countingAnswer = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0f, 0x00, 0x02]
+        self.endTransfer = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0f, 0x00, 0x02]
 
         #Messages from the client
         self.clientHi = [0x00, 0x04, 0x04, 0x1a, 0x17, 0x02, 0xe6, 0xdf, 0x00, 0x00, 0x00, 0x00]
@@ -51,6 +50,7 @@ class RobotClient:
 
         #Do the handshake
         self.handshake()
+        print('i am here')
         
 
     ##############################################################################
@@ -60,8 +60,12 @@ class RobotClient:
         f = open(self.fileName,'wb')
         l = self.s.recv(1024)
         while(l):
+            print('iam in the client receive')
             f.write(l)
             l = self.s.recv(1024)
+            if not l:
+                break
+        print('finish file transfer')
         f.close()
     ##############################################################################
     
