@@ -27,7 +27,7 @@ class CameraServer:
         self.robot_PORT = robot_PORT
 
         #Picture name
-        self.pictureName = 'pictureReceived.png'
+        self.pictureName = 'picture.png'
 
         #Messages from the server
         self.serverHi = [0x00, 0x00, 0x00, 0x04, 0x00, 0x0a, 0x00, 0xa4]
@@ -48,28 +48,31 @@ class CameraServer:
         server_address = (self.robot_IP, self.robot_PORT)
         self.s.bind(server_address)
         self.s.listen(1)
-        self.connection, self.client_address = self.s.accept()
-        self.printLog('Connection request from: ' + self.client_address[0])
+        while True:
+            self.connection, self.client_address = self.s.accept()
+            self.printLog('Connection request from: ' + self.client_address[0])
 
-        try:
-            #Start the server action
-            data = self.connection.recv(12) 
-            if self.isHandshake(data):
-                if not self.handleHandshake(data):
-                    self.printError("The handshake was not successful")
-                    self.exit()
-            while True:
+            try:
+                #Start the server action
                 data = self.connection.recv(12) 
-                if not data:
-                    continue
-                if self.isTakePic(data):
-                    self.handlePic()
-                else:
-                    self.printError("Unexpected message from the client: exiting")
-                    self.exit()     
-        finally:
-            self.printError('Connection with client closed')
-            self.exit()
+                if self.isHandshake(data):
+                    self.printLog('Client says hi')
+                    if not self.handleHandshake(data):
+                        self.printError("The handshake was not successful")
+                        self.exit()
+                while True:
+                    data = self.connection.recv(12) 
+                    if not data:
+                        continue
+                    if self.isTakePic(data):
+                        self.handlePic()
+                        break
+                    else:
+                        self.printError("Unexpected message from the client: exiting")
+                        self.exit()     
+            finally:
+                self.printError('Connection with client closed')
+                self.exit()
     ##############################################################################
 
     ##############################################################################
@@ -149,6 +152,7 @@ class CameraServer:
         #First handshake message
         firstmessage = bytearray(self.serverHi) 
         self.connection.sendall(firstmessage)
+        self.printLog('Server sends hi')
         if not self.checkAnswer():
             self.printError("The OK message was not received")
             self.exit()
@@ -161,16 +165,20 @@ class CameraServer:
     def handlePic(self):
 
         #self.takeTheActualPicture()
+        self.printLog('Client requests a picture')
         time.sleep(2)
+        self.printLog('Sending file')
         f = open(self.pictureName, 'rb')
         l = f.read(1024)
-        print(l)
         while (l):
             print('sending info')
-            self.connection.sendall(l)
+            self.connection.send(l)
             l = f.read(1024)
         f.close()
-        print('finish file transfer server')
+        self.printLog('Transfer file finished')
+        self.printLog('Closing connection')
+        self.connection.shutdown(2)
+        self.connection.close()
         return True
     ##############################################################################
       

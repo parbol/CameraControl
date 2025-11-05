@@ -72,12 +72,13 @@ class RobotClient:
 
     ##############################################################################
     def handshake(self):
-    
+        self.printLog('Client sends hi')
         self.s.sendall(bytearray(self.clientHi))
         data = self.s.recv(12)
         if not self.isEqual(data, self.serverHi):
             self.printError('Server Handshake response is not valid')
             self.exit()
+        self.printLog('Server says hi')
         self.sendConfirmation()
 
     ##############################################################################
