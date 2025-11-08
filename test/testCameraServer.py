@@ -10,4 +10,4 @@ if __name__ == "__main__":
     parser.add_option("-p", "--port",            dest="port",            type=int,       default=1999,             help="Port of the server.")
     (options, args) = parser.parse_args()
 
-    server = CameraServer(options.ip, options.port)
+    server = CameraServer(options.ip, options.port, 'picture.png')

@@ -12,5 +12,8 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     client = RobotClient(options.ip, options.port, options.filenameinput)
-    time.sleep(20)
+    time.sleep(4)
     client.takePic()
+    time.sleep(4)
+    client.takePic()
+    client.stop()
