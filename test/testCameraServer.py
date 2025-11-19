@@ -1,6 +1,10 @@
 from optparse import OptionParser
+from matplotlib.image import imread
+from IDS_Camera import *
+
+from Image import *  
 from CameraServer.CameraServer import CameraServer
-  
+from CameraServer.Camera import Camera
 
 
 if __name__ == "__main__":
@@ -10,4 +14,10 @@ if __name__ == "__main__":
     parser.add_option("-p", "--port",            dest="port",            type=int,       default=1999,             help="Port of the server.")
     (options, args) = parser.parse_args()
 
-    server = CameraServer(options.ip, options.port, 'picture.png')
+    camera = Camera('picture.png')
+    camera.start_acquisition().set_exposure(1/250)
+    
+    server = CameraServer(options.ip, options.port, camera)
+    
+    camera.close_device()
+

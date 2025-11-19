@@ -10,10 +10,14 @@ import time
 import os
 import math
 
+from Image import *
+
+
+
 class CameraServer:
 
     ##############################################################################
-    def __init__(self, robot_IP, robot_PORT, pictureName):
+    def __init__(self, robot_IP, robot_PORT, camera):
 
         #Technical stuff
         self.HEADER = '\033[95m'
@@ -22,12 +26,15 @@ class CameraServer:
         self.FAIL = '\033[91m'
         self.ENDC = '\033[0m'
 
+        #Camera controler
+        self.camera = camera
+
         #Information for the client
         self.robot_IP = robot_IP
         self.robot_PORT = robot_PORT
 
         #Picture name
-        self.pictureName = pictureName
+        self.pictureName = camera.filename
 
         self.showBanner()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -161,7 +168,10 @@ class CameraServer:
         self.printLog('Client has requested a picture')
         
         #This should be taking the picture
-        time.sleep(2)
+        camera.get_image()
+        picture = camera.image
+        picture.save(self.pictureName, "PNG")
+
         try:
             filesize = os.path.getsize(self.pictureName)
         except:
