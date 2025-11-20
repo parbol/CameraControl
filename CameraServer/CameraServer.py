@@ -10,7 +10,7 @@ import time
 import os
 import math
 
-from Image import *
+from PIL import Image
 
 
 
@@ -104,10 +104,15 @@ class CameraServer:
     ##############################################################################
     def getMessage(self):
 
-        msg = self.connection.recv(512)
-        msg = msg.decode()
-        text = msg[0:msg.find('XXXXX')]
-        return text
+        counter = 0
+        text = ''
+        while True:
+            msg = self.connection.recv(512)
+            text = text + msg.decode()
+            counter = counter + len(msg)
+            if counter == 512:
+                break
+        return text[0:text.find('XXXXX')]
     ##############################################################################
 
     ##############################################################################
@@ -168,10 +173,9 @@ class CameraServer:
         self.printLog('Client has requested a picture')
         
         #This should be taking the picture
-        camera.get_image()
-        picture = camera.image
+        self.camera.get_image()
+        picture = self.camera.image
         picture.save(self.pictureName, "PNG")
-
         try:
             filesize = os.path.getsize(self.pictureName)
         except:

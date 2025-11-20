@@ -1,8 +1,6 @@
 from optparse import OptionParser
 from matplotlib.image import imread
-from IDS_Camera import *
 
-from Image import *  
 from CameraServer.CameraServer import CameraServer
 from CameraServer.Camera import Camera
 

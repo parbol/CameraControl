@@ -127,9 +127,15 @@ class RobotClient:
     ##############################################################################
     def getMessage(self):
 
-        msg = self.s.recv(512)
-        msg = msg.decode()
-        return msg[0:msg.find('XXXXX')]
+        counter = 0
+        text = ''
+        while True:
+            msg = self.s.recv(512)
+            text = text + msg.decode()
+            counter = counter + len(msg)
+            if counter == 512:
+                break
+        return text[0:text.find('XXXXX')]
     #############################################################################
 
     ##############################################################################
@@ -147,13 +153,13 @@ class RobotClient:
     def getFile(self, filename, filesize):
 
         f = open(self.fileName, 'wb')
-        nrows = math.floor(filesize/2048)
-        extra = filesize % 2048
-        for i in range(0, nrows):
+        counter = 0
+        while True:
             l = self.s.recv(2048)
+            counter = counter + len(l)
             f.write(l)
-        l = self.s.recv(extra)
-        f.write(l)
+            if counter == filesize:
+                break
         f.close()
     ##############################################################################
   

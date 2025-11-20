@@ -9,10 +9,14 @@ Date: Feb 13th, 2025
 import ids_peak.ids_peak as ids_peak
 import ids_peak_ipl.ids_peak_ipl as ids_ipl
 import ids_peak.ids_peak_ipl_extension as ids_ipl_extension
+
+#from ids_peak import ids_peak
+#from ids_peak_ipl import ids_peak_ipl
+#from ids_peak import ids_ipl_extension
 import numpy as np
 from matplotlib import pyplot as plt
 
-from Image import *
+from PIL import Image 
 
 
 class Camera:
@@ -74,7 +78,6 @@ class Camera:
             self.remote_device_nodemap.FindNode("TriggerSource").SetCurrentEntry("Software")
             self.remote_device_nodemap.FindNode("TriggerMode").SetCurrentEntry("On")
 
-            return self
         except Exception as e:
             print('No device is free and available. ERR:' + str(e))
             ids_peak.Library.Close()
@@ -130,8 +133,7 @@ class Camera:
             #raw_image = ids_ipl.Image_CreateFromSizeAndBuffer(buffer.PixelFormat(), buffer.BasePtr(), buffer.Size(), buffer.Width(), buffer.Height())
             color_image = raw_image.ConvertTo(ids_ipl.PixelFormatName_RGB8)
             self.datastream.QueueBuffer(buffer)
-
-            self.image = Image(color_image.get_numpy_3D())
+            self.image = Image.fromarray(color_image.get_numpy_3D())
         except Exception as e:
             print('No device is free and available. ERR:' + str(e))
             ids_peak.Library.Close()
