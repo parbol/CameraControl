@@ -116,6 +116,7 @@ class RobotController:
                 break
         return text[0:text.find('XXXXX')]
     #############################################################################
+    
 
     ##############################################################################
     def sendMessage(self, msg):
@@ -129,3 +130,24 @@ class RobotController:
     ##############################################################################
 
   
+    ##############################################################################
+    def goTo(self, x, y, z, v):
+
+        xs = str(x)
+        ys = str(y)
+        zs = str(z)
+        vx = str(z)
+        cadena = f'GOTO({xs},{ys},{zs},{vs})'
+        
+        sel.sendMessage(cadena)
+        data = self.getMessage()
+        if data == 'OK':
+            return True
+        else:
+            self.printError('Unexpected message from CS9')
+            sys.exit()
+        return True
+    ##############################################################################
+
+  
+
