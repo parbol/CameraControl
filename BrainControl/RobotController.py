@@ -137,7 +137,16 @@ class RobotController:
         ys = str(y)
         zs = str(z)
         vx = str(z)
-        cadena = f'GOTO({xs},{ys},{zs},{vs})'
+        if x >= 0:
+            xs = '+' + xs
+        if y >= 0:
+            ys = '+' + ys
+        if z >= 0:
+            zs = '+' + zs
+        if v >= 0:
+            vs = '+' + vs
+
+        cadena = f'GOTO:{xs}{ys}{zs}{vs})'
         
         sel.sendMessage(cadena)
         data = self.getMessage()
